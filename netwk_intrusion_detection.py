@@ -69,3 +69,5 @@ train_x= pd.DataFrame(train_x, columns = cols)
 test_x = scaler.fit_transform(test_x)
 test_x= pd.DataFrame(test_x, columns = cols2)
 
+#Model
+
