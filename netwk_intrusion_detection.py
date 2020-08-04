@@ -69,5 +69,104 @@ train_x= pd.DataFrame(train_x, columns = cols)
 test_x = scaler.fit_transform(test_x)
 test_x= pd.DataFrame(test_x, columns = cols2)
 
-#Model
+#carry out Univariate Feature selection to check out the important features.
+from sklearn.feature_selection import SelectKBest, f_classif, RFE
+X = train_x.iloc[0:,0:-1] # Features columnsx = x.astype(str)
+y = train_y # Label column
+bestfeatures = SelectKBest(score_func = f_classif, k = "all")
+fit = bestfeatures.fit(X,y)
+dfscores = pd.DataFrame(fit.scores_)
+dfcolumns = pd.DataFrame(X.columns)
+#concat the two dataframes for better visualization
+features_scores=pd.concat([dfcolumns,dfscores], axis = 1)
+features_scores.columns = ['features ', 'scores']
+print(features_scores.nlargest(50,'scores'))
 
+#Lets create the RFE model and select the best attributes to be used for further analysis later
+rfe = RFE(model, n_features_to_select = 40)
+rfe = rfe.fit(train_x,train_y)
+
+feature_map = [(i,v) for i, v in itertools.zip_longest(rfe.get_support(), cols)]
+selected_features = [v for i, v in feature_map if i == True]
+print(selected_features)
+
+#Performing Machine learning procedure on our dataset
+
+#Split the data into training and test set
+from sklearn.model_selection import train_test_split
+X_train,X_test,Y_train,Y_test = train_test_split(train_x,train_y,test_size = 0.3, random_state = 42)
+
+#We test several machine learning algorithms to see whic gives us the best results
+# Training the Logistic Regression model on the Training set
+from sklearn.linear_model import LogisticRegression
+classifier = LogisticRegression(random_state = 0)
+classifier.fit(X_train, Y_train)
+
+# Predicting the Test set results
+y_pred = classifier.predict(X_test)
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(Y_test, y_pred)
+print(cm)
+
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_pred, Y_test)
+precision = precision_score(y_pred, Y_test)
+recall = recall_score(y_pred, Y_test)
+
+print("The accuracy gotten from linear regression model is", accuracy)
+print("The Precision gotten from the linear regression model is", precision)
+print("The recall score from the model is", recall)
+
+# Training the Decision Tree Classification model on the Training set
+from sklearn.tree import DecisionTreeClassifier
+classifier2 = DecisionTreeClassifier(criterion = 'entropy', random_state = 0)
+classifier2.fit(X_train, Y_train)
+
+# Predicting the Test set results
+y_pred2 = classifier2.predict(X_test)
+
+cm2 = confusion_matrix(Y_test, y_pred2)
+print(cm2)
+
+accuracy = accuracy_score(y_pred2, Y_test)
+precision = precision_score(y_pred2, Y_test)
+recall = recall_score(y_pred2, Y_test)
+
+print("The accuracy for the decision tree classifier is", accuracy)
+print("The precision using the decision tree classifier is", precision)
+print(" The recall score using the decision tree classifier is", recall)
+
+#Using only the important features found earlier to create another set of models to see if we get better results
+list_new = selected_features
+train_x_new = train_x.loc[:, train_x.columns.intersection(list_new)]
+test_x_new = train_x.loc[:, train_x.columns.intersection(list_new)]
+
+from sklearn.model_selection import train_test_split
+X_train2,X_test2,Y_train2,Y_test2 = train_test_split(train_x_new,train_y,test_size = 0.3, random_state = 42)
+
+# Training the Decision Tree Classification model on the Training set
+from sklearn.tree import DecisionTreeClassifier
+classifier3 = DecisionTreeClassifier(criterion = 'entropy', random_state = 0)
+classifier3.fit(X_train2, Y_train2)
+
+# Predicting the Test set results
+y_pred3 = classifier3.predict(X_test2)
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm3 = confusion_matrix(Y_test2, y_pred3)
+print(cm3)
+
+accuracy = accuracy_score(y_pred3, Y_test2)
+precision = precision_score(y_pred3, Y_test2)
+recall = recall_score(y_pred3, Y_test2)
+
+print("The accuracy for the decision tree classifier is", accuracy)
+print("The precision using the decision tree classifier is", precision)
+print(" The recall score using the decision tree classifier is", recall)
