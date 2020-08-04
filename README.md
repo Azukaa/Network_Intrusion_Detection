@@ -1,6 +1,6 @@
 # Network_intrusion_detection
 
-This project applies machine learning models on the KDD dataset of network flow traffic to determine anomalies in computer networks.
+**This project applies machine learning models on the KDD dataset of network flow traffic to determine anomalies in computer networks.
 
 Dataset cleaning and Exploratory Data Analysis carried out and num_outbounds_cmds attribute was removed from the dataset as it was shown to not add any effect to the dataset.
 
