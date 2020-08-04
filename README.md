@@ -1,3 +1,3 @@
 # Network_intrusion_detection
 
-This Model uses Machine learning algorithms to determine anomalies in a network.
+This project applies machine learning models on the KDD dataset of network flow traffic to determine anomalies in computer networks.
